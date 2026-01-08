@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FileText, Clock } from 'lucide-react'
+import { Clock } from 'lucide-react'
 
 interface Activity {
   id: string
