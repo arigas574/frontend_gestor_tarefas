@@ -4,7 +4,7 @@ import { Lock, Mail, User, ArrowRight, Loader2 } from 'lucide-react'
 
 export function LoginPage() {
   const navigate = useNavigate()
-  const [isRegister, setIsRegister] = useState(false)
+  const [isRegister, setIsRegister] = useState(false) //login ou cadastro
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -14,12 +14,14 @@ export function LoginPage() {
     password: ''
   })
 
+  //separa login e cadastro
   const [registerData, setRegisterData] = useState({
     name: '',
     email: '',
     password: ''
   })
 
+  //atualiza o login
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value })
   }
@@ -30,7 +32,7 @@ export function LoginPage() {
 
   const toggleMode = () => {
     setIsRegister(!isRegister)
-    setError('') // Limpa erros anteriores ao trocar de tela
+    setError('') 
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +42,6 @@ export function LoginPage() {
 
     const endpoint = isRegister ? '/register' : '/login'
     
-    // Seleciona o payload correto baseado na tela atual
     const payload = isRegister ? registerData : loginData
 
     try {
@@ -54,14 +55,15 @@ export function LoginPage() {
 
       const data = await response.json()
 
+      //se o status nao for 200-209, erro cai no catch
       if (!response.ok) throw new Error(data.error || 'Erro na requisição')
 
       if (isRegister) {
         alert('Conta criada com sucesso! Faça login.')
-        // Opcional: Limpar formulário de cadastro após sucesso
         setRegisterData({ name: '', email: '', password: '' })
         setIsRegister(false)
       } else {
+        //salva id
         localStorage.setItem('user_id', data.id)
         localStorage.setItem('user_name', data.name)
         navigate('/activities')
@@ -85,7 +87,6 @@ export function LoginPage() {
           {error && <div style={{ color: '#b91c1c', fontSize: '0.9rem', background: '#fef2f2', padding: '0.75rem', borderRadius: '6px', border: '1px solid #fecaca', textAlign: 'center' }}>{error}</div>}
 
           {isRegister ? (
-            // --- CAMPOS DE CADASTRO ---
             <>
               <div className="input-group">
                 <label style={{ fontSize: '0.9rem', fontWeight: 500, marginBottom: '0.25rem', display: 'block' }}>Nome</label>

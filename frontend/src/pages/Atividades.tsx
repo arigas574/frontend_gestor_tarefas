@@ -17,13 +17,12 @@ export function ActivitiesPage() {
   
   const userId = localStorage.getItem('user_id')
 
-  // Buscar dados ao carregar
+  // busca os dados quando carrega
   useEffect(() => {
     if (userId) {
       fetch(`http://localhost:3333/activities/${userId}`)
         .then(res => res.json())
         .then(data => {
-            // Garante que é um array, se der erro vem objeto de erro
             if(Array.isArray(data)) setActivities(data)
         })
         .catch(err => console.error("Erro ao buscar:", err))
@@ -37,11 +36,9 @@ export function ActivitiesPage() {
     setLoading(true)
 
     try {
-      // 1. Converter datas para formato ISO Universal para não dar erro no banco
       const startDateISO = new Date(start).toISOString()
       const endDateISO = new Date(end).toISOString()
 
-      // 2. Enviar requisição
       const response = await fetch('http://localhost:3333/activities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,10 +54,10 @@ export function ActivitiesPage() {
 
       if (!response.ok) throw new Error(data.error || 'Erro ao salvar')
 
-      // 3. Atualizar lista visualmente
+      // atualiza a lista
       setActivities([...activities, data])
       
-      // 4. Limpar formulário
+      // limpa os inputs
       setName('')
       setStart('')
       setEnd('')
