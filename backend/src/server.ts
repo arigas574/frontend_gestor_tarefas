@@ -31,7 +31,7 @@ app.post('/register', async (req: any, res: any) => {
 app.post('/login', async (req: any, res: any) => {
   const { email, password } = req.body
   
-  // 1. logica de como funciona o email
+  // logica de como funciona o email
   const user = await prisma.user.findUnique({ where: { email } })
   if (!user) {
     return res.status(404).json({ error: 'E-mail não cadastrado. Crie uma conta!' })
