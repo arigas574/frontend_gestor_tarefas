@@ -4,8 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-
-  url      = "postgresql://postgres:desafio3@localhost:5432/gestor_tarefas?schema=public"
+  url      = env("DATABASE_URL")
 }
 
 model User {
