@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react'
+import { FileText, Clock } from 'lucide-react'
+
 interface Activity {
   id: string
   name: string
@@ -5,58 +8,88 @@ interface Activity {
   endDate: string
 }
 
-const MOCK_DATA: Activity[] = [
-  { id: '1', name: 'Consulta', startDate: '2022-01-05T09:00', endDate: '2022-01-05T09:30' }, 
-  { id: '2', name: 'Almoço', startDate: '2022-01-05T12:00', endDate: '2022-01-05T13:30' },   
-  { id: '3', name: 'Reunião', startDate: '2022-01-06T13:00', endDate: '2022-01-06T14:00' },  
-  { id: '4', name: 'Visita', startDate: '2022-01-06T16:00', endDate: '2022-01-06T18:30' },   
-]
-
 export function ReportPage() {
-  
-  const processReport = (data: Activity[]) => {
-    const reportMap = new Map<string, number>()
+  const [activities, setActivities] = useState<Activity[]>([])
+  const userId = localStorage.getItem('user_id')
 
-    data.forEach(activity => {
-      const start = new Date(activity.startDate)
-      const end = new Date(activity.endDate)
-      const dateKey = start.toLocaleDateString('pt-BR')
-      
-      const diffMs = end.getTime() - start.getTime()
-      const diffHours = diffMs / (1000 * 60 * 60)
+  useEffect(() => {
+    if (userId) {
+      fetch(`http://localhost:3333/activities/${userId}`)
+        .then(res => res.json())
+        .then(data => {
+             if(Array.isArray(data)) setActivities(data)
+        })
+    }
+  }, [userId])
 
-      const currentTotal = reportMap.get(dateKey) || 0
-      reportMap.set(dateKey, currentTotal + diffHours)
-    })
-
-    return Array.from(reportMap.entries())
+  // calcula a diferença de horas
+  const calculateDuration = (start: string, end: string) => {
+    const startTime = new Date(start).getTime()
+    const endTime = new Date(end).getTime()
+    const diffMs = endTime - startTime
+    
+    // conversao de milisegundos para horas
+    const hours = diffMs / (1000 * 60 * 60)
+    return hours.toFixed(2) 
   }
 
-  const reportData = processReport(MOCK_DATA)
+  // calcula total
+  const totalHours = activities.reduce((acc, curr) => {
+    return acc + parseFloat(calculateDuration(curr.startDate, curr.endDate))
+  }, 0).toFixed(2)
 
   return (
     <div className="page-container">
-      <header className="page-header">
-        <h1>Relatório de Horas</h1>
+      <header style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.8rem', color: '#1e293b' }}>Relatório de Horas</h1>
+        <p style={{ color: '#64748b' }}>Resumo de produtividade e tempo gasto.</p>
       </header>
 
-      <div className="report-table-container">
-        <table className="report-table">
-          <thead>
+      <div className="card" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem', borderColor: '#818cf8', background: '#e0e7ff' }}>
+        <div style={{ background: 'white', padding: '1rem', borderRadius: '50%', color: '#4f46e5' }}>
+            <Clock size={32} />
+        </div>
+        <div>
+            <span style={{ display: 'block', fontSize: '0.9rem', color: '#4338ca', fontWeight: 600 }}>TEMPO TOTAL REGISTRADO</span>
+            <strong style={{ fontSize: '2rem', color: '#312e81' }}>{totalHours} horas</strong>
+        </div>
+      </div>
+
+      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
             <tr>
-              <th>Dia</th>
-              <th className="text-right">Tempo Total</th>
+              <th style={{ padding: '1rem', fontSize: '0.85rem', color: '#64748b' }}>DATA</th>
+              <th style={{ padding: '1rem', fontSize: '0.85rem', color: '#64748b' }}>ATIVIDADE</th>
+              <th style={{ padding: '1rem', fontSize: '0.85rem', color: '#64748b' }}>HORÁRIO</th>
+              <th style={{ padding: '1rem', fontSize: '0.85rem', color: '#64748b' }}>DURAÇÃO</th>
             </tr>
           </thead>
           <tbody>
-            {reportData.map(([date, hours]) => (
-              <tr key={date}>
-                <td>{date}</td>
-                <td className="text-right">
-                  {hours.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 1 })}hrs
-                </td>
-              </tr>
-            ))}
+            {activities.length === 0 ? (
+                <tr>
+                    <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                        Sem dados para o relatório.
+                    </td>
+                </tr>
+            ) : (
+                activities.map(act => (
+                <tr key={act.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '1rem', color: '#334155' }}>
+                        {new Date(act.startDate).toLocaleDateString()}
+                    </td>
+                    <td style={{ padding: '1rem', fontWeight: 500 }}>
+                        {act.name}
+                    </td>
+                    <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.9rem' }}>
+                        {new Date(act.startDate).toLocaleTimeString().slice(0,5)} - {new Date(act.endDate).toLocaleTimeString().slice(0,5)}
+                    </td>
+                    <td style={{ padding: '1rem', color: '#4f46e5', fontWeight: 600 }}>
+                        {calculateDuration(act.startDate, act.endDate)} h
+                    </td>
+                </tr>
+                ))
+            )}
           </tbody>
         </table>
       </div>
