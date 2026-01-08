@@ -14,7 +14,7 @@ export function ReportPage() {
 
   useEffect(() => {
     if (userId) {
-      fetch(`http://localhost:3333/activities/${userId}`)
+      fetch(`https://frontend-gestor-tarefas.onrender.com${userId}`)
         .then(res => res.json())
         .then(data => {
              if(Array.isArray(data)) setActivities(data)

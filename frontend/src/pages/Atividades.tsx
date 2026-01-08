@@ -20,7 +20,7 @@ export function ActivitiesPage() {
   // busca os dados quando carrega
   useEffect(() => {
     if (userId) {
-      fetch(`http://localhost:3333/activities/${userId}`)
+      fetch(`https://frontend-gestor-tarefas.onrender.com${userId}`)
         .then(res => res.json())
         .then(data => {
             if(Array.isArray(data)) setActivities(data)
@@ -39,7 +39,7 @@ export function ActivitiesPage() {
       const startDateISO = new Date(start).toISOString()
       const endDateISO = new Date(end).toISOString()
 
-      const response = await fetch('http://localhost:3333/activities', {
+      const response = await fetch('https://frontend-gestor-tarefas.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -73,7 +73,7 @@ export function ActivitiesPage() {
     if(!confirm("Tem certeza que deseja excluir?")) return
     
     try {
-      await fetch(`http://localhost:3333/activities/${id}`, { method: 'DELETE' })
+      await fetch(`https://frontend-gestor-tarefas.onrender.com${id}`, { method: 'DELETE' })
       setActivities(activities.filter(a => a.id !== id))
     } catch (error) {
       alert("Erro ao deletar")

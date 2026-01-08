@@ -8,7 +8,6 @@ export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Estados separados para Login e Cadastro
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -47,7 +46,7 @@ export function LoginPage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      const response = await fetch(`http://localhost:3333${endpoint}`, {
+      const response = await fetch(`https://frontend-gestor-tarefas.onrender.com${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -136,7 +135,6 @@ export function LoginPage() {
               </div>
             </>
           ) : (
-            // --- CAMPOS DE LOGIN ---
             <>
               <div className="input-group">
                 <label style={{ fontSize: '0.9rem', fontWeight: 500, marginBottom: '0.25rem', display: 'block' }}>E-mail</label>
